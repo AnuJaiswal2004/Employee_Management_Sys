@@ -11,90 +11,122 @@ const CreateTask = () => {
     const [asignTo, setAsignTo] = useState('')
     const [category, setCategory] = useState('')
 
-    const [newTask, setNewTask] = useState({})
-
     const submitHandler = (e) => {
         e.preventDefault()
 
-        setNewTask({ taskTitle, taskDescription, taskDate, category, active: false, newTask: true, failed: false, completed: false })
+        const taskObj = { 
+            taskTitle, 
+            taskDescription, 
+            taskDate, 
+            category, 
+            active: false, 
+            newTask: true, 
+            failed: false, 
+            completed: false 
+        }
 
-        const data = userData
+        const data = [...userData]
+        let employeeFound = false
 
         data.forEach(function (elem) {
-            if (asignTo == elem.firstName) {
-                elem.tasks.push(newTask)
+            if (asignTo.toLowerCase() === elem.firstName.toLowerCase()) {
+                elem.tasks.push(taskObj)
                 elem.taskCounts.newTask = elem.taskCounts.newTask + 1
+                employeeFound = true
             }
         })
+
+        if (!employeeFound) {
+            alert(`Employee "${asignTo}" not found. Please assign it to a valid registered employee.`)
+            return
+        }
+
         setUserData(data)
-        console.log(data);
+        localStorage.setItem('employees', JSON.stringify(data))
 
         setTaskTitle('')
         setCategory('')
         setAsignTo('')
         setTaskDate('')
         setTaskDescription('')
-
     }
 
     return (
-        <div className='p-5 bg-[#1c1c1c] mt-5 rounded'>
-            <form onSubmit={(e) => {
-                submitHandler(e)
-            }}
-                className='flex flex-wrap w-full items-start justify-between'
-            >
-                <div className='w-1/2'>
+        <section className="bg-[#0f1424]/40 backdrop-blur-md border border-gray-800/60 p-6 md:p-8 rounded-3xl shadow-2xl relative overflow-hidden mt-6">
+            <header className="mb-6">
+                <h2 className="text-xl font-bold text-white tracking-tight">Create New Task</h2>
+                <p className="text-sm text-gray-400 mt-1">Fill out the details to assign a task to your team members.</p>
+            </header>
+
+            <form onSubmit={submitHandler} className="grid grid-cols-1 md:grid-cols-12 gap-6 w-full items-start">
+                <div className="md:col-span-6 space-y-4">
                     <div>
-                        <h3 className='text-sm text-gray-300 mb-0.5'>Task Title</h3>
+                        <label htmlFor="taskTitle" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Task Title</label>
                         <input
+                            id="taskTitle"
+                            required
                             value={taskTitle}
-                            onChange={(e) => {
-                                setTaskTitle(e.target.value)
-                            }}
-                            className='text-sm py-1 px-2 w-4/5 rounded outline-none bg-transparent border-[1px] border-gray-400 mb-4' type="text" placeholder='Make a UI design'
+                            onChange={(e) => setTaskTitle(e.target.value)}
+                            className="w-full bg-[#0a0e1a]/60 border border-gray-800 text-white placeholder-gray-600 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500/80 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200 text-sm"
+                            type="text" 
+                            placeholder="Make a UI design"
                         />
                     </div>
                     <div>
-                        <h3 className='text-sm text-gray-300 mb-0.5'>Date</h3>
+                        <label htmlFor="taskDate" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Due Date</label>
                         <input
+                            id="taskDate"
+                            required
                             value={taskDate}
-                            onChange={(e) => {
-                                setTaskDate(e.target.value)
-                            }}
-                            className='text-sm py-1 px-2 w-4/5 rounded outline-none bg-transparent border-[1px] border-gray-400 mb-4' type="date" />
+                            onChange={(e) => setTaskDate(e.target.value)}
+                            className="w-full bg-[#0a0e1a]/60 border border-gray-800 text-white rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500/80 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200 text-sm scheme-dark" 
+                            type="date" 
+                        />
                     </div>
                     <div>
-                        <h3 className='text-sm text-gray-300 mb-0.5'>Asign to</h3>
+                        <label htmlFor="asignTo" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Assign To</label>
                         <input
+                            id="asignTo"
+                            required
                             value={asignTo}
-                            onChange={(e) => {
-                                setAsignTo(e.target.value)
-                            }}
-                            className='text-sm py-1 px-2 w-4/5 rounded outline-none bg-transparent border-[1px] border-gray-400 mb-4' type="text" placeholder='employee name' />
+                            onChange={(e) => setAsignTo(e.target.value)}
+                            className="w-full bg-[#0a0e1a]/60 border border-gray-800 text-white placeholder-gray-600 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500/80 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200 text-sm"
+                            type="text" 
+                            placeholder="Employee first name (e.g. Arjun)" 
+                        />
                     </div>
                     <div>
-                        <h3 className='text-sm text-gray-300 mb-0.5'>Category</h3>
+                        <label htmlFor="category" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Category</label>
                         <input
+                            id="category"
+                            required
                             value={category}
-                            onChange={(e) => {
-                                setCategory(e.target.value)
-                            }}
-                            className='text-sm py-1 px-2 w-4/5 rounded outline-none bg-transparent border-[1px] border-gray-400 mb-4' type="text" placeholder='design, dev, etc' />
+                            onChange={(e) => setCategory(e.target.value)}
+                            className="w-full bg-[#0a0e1a]/60 border border-gray-800 text-white placeholder-gray-600 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500/80 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200 text-sm"
+                            type="text" 
+                            placeholder="Design, Dev, QA, etc." 
+                        />
                     </div>
                 </div>
 
-                <div className='w-2/5 flex flex-col items-start'>
-                    <h3 className='text-sm text-gray-300 mb-0.5'>Description</h3>
-                    <textarea value={taskDescription}
-                        onChange={(e) => {
-                            setTaskDescription(e.target.value)
-                        }} className='w-full h-44 text-sm py-2 px-4 rounded outline-none bg-transparent border-[1px] border-gray-400' name="" id=""></textarea>
-                    <button className='bg-emerald-500 py-3 hover:bg-emerald-600 px-5 rounded text-sm mt-4 w-full'>Create Task</button>
+                <div className="md:col-span-6 flex flex-col h-full justify-between">
+                    <div className="w-full">
+                        <label htmlFor="taskDescription" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Description</label>
+                        <textarea 
+                            id="taskDescription"
+                            required
+                            value={taskDescription}
+                            onChange={(e) => setTaskDescription(e.target.value)} 
+                            className="w-full h-48 bg-[#0a0e1a]/60 border border-gray-800 text-white placeholder-gray-600 rounded-xl px-4 py-3.5 focus:outline-none focus:border-emerald-500/80 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200 text-sm resize-none" 
+                            placeholder="Provide a detailed description of the task..."
+                        />
+                    </div>
+                    <button className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold py-3.5 rounded-xl transition-all duration-300 shadow-lg shadow-emerald-950/20 active:scale-[0.99] cursor-pointer mt-4 text-sm">
+                        Create Task
+                    </button>
                 </div>
-
             </form>
-        </div>
+        </section>
     )
 }
 
